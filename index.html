@@ -60,109 +60,63 @@
     </script>
 
     <style>
-      .wave-float {
-        animation: wave-float 1.8s ease-out forwards;
-      }
-
-      @keyframes wave-float {
-        0% {
-          opacity: 0;
-          transform: translate(-50%, 0) scale(0.7);
-        }
-        20% {
-          opacity: 1;
-          transform: translate(-50%, -18px) scale(1);
-        }
-        100% {
-          opacity: 0;
-          transform: translate(-50%, -120px) scale(1.2);
-        }
+      html {
+        scroll-behavior: smooth;
       }
     </style>
   </head>
 
-  <!-- The classes below set the gradient background and center the card. -->
-  <body
-    class="min-h-screen bg-gradient-to-br from-rose-400 via-orange-300 to-sky-500 flex justify-center items-start p-4"
-  >
-    <main class="bg-white/95 w-full max-w-2xl my-12 p-10 rounded-2xl shadow-2xl border border-sky-100">
-      <!-- ▼▼▼ START EDITING HERE ▼▼▼ -->
-
-      <h1 class="text-4xl font-extrabold text-slate-800">
-        Hi, I'm Hillia <span class="inline-block text-rose-500">👋</span>
-      </h1>
-      <p class="text-lg text-gray-500 mt-1">
-        A future developer learning Git, GitHub, and Copilot.
-      </p>
-
-      <h2 class="text-2xl font-semibold mt-8 pb-1 border-b-4 border-rose-400 text-sky-700">
-        About Me
-      </h2>
-      <p class="mt-3 text-gray-700">
-        Hi! My name is Hillia and I'm a 11th grader at Waukee Northwest Highschool. I do First Tech Challenge (FTC) whihc got me more interested around STEM.
-      </p>
-
-      <h2 class="text-2xl font-semibold mt-8 pb-1 border-b-4 border-rose-400 text-sky-700">
-        Things I'm Into...
-      </h2>
-      <ul class="mt-3 space-y-1 text-gray-700 list-disc list-inside">
-        <li>Pickleball</li>
-        <li>Dance</li>
-        <li>Robotics</li>
-      </ul>
-
-      <h2 class="text-2xl font-semibold mt-8 pb-1 border-b-4 border-rose-400 text-sky-700">
-        What I'm Learning
-      </h2>
-      <p class="mt-3 text-gray-700">
-        Right now I'm learning how developers build and share software with
-        GitHub. This page is proof — I wrote it and published it myself!
-      </p>
-
-      <!--
-        A little interactive button, powered by Alpine.js.
-        x-data gives this box a tiny bit of "memory" (waves),
-        @click runs code when clicked, and x-text shows a value.
-      -->
-      <div x-data="{ waves: 0, showHint: false, floatingWaves: [] }" class="mt-8 relative">
-        <div class="inline-block relative">
-          <button
-            @mouseenter="showHint = true"
-            @mouseleave="showHint = false"
-            @click="waves++; const burst = Array.from({ length: 14 }, (_, i) => ({ id: Date.now() + i, x: 10 + Math.random() * 80, y: 20 + Math.random() * 40 })); floatingWaves = [...floatingWaves, ...burst]; setTimeout(() => { floatingWaves = floatingWaves.filter((item) => !burst.some((b) => b.id === item.id)); }, 1800)"
-            class="bg-sky-600 hover:bg-sky-700 text-white font-semibold px-5 py-2 rounded-lg shadow transition"
+  <body class="min-h-screen bg-gradient-to-br from-rose-400 via-orange-300 to-sky-500 p-4">
+    <main class="mx-auto flex max-w-5xl flex-col gap-8 py-6">
+      <section class="flex min-h-[80vh] items-center justify-center">
+        <div class="w-full rounded-3xl border border-sky-100 bg-white/95 p-10 text-center shadow-2xl">
+          <p class="text-sm font-semibold uppercase tracking-[0.3em] text-rose-500">
+            Welcome
+          </p>
+          <h1 class="mt-4 text-5xl font-extrabold text-slate-800 sm:text-6xl">
+            Hi, I'm Hillia <span class="inline-block text-rose-500">👋</span>
+          </h1>
+          <p class="mx-auto mt-5 max-w-2xl text-lg text-gray-600">
+            A future developer learning Git, GitHub, and Copilot while building my own little corner of the web.
+          </p>
+          <a
+            href="#about"
+            class="mt-8 inline-block rounded-full bg-sky-600 px-6 py-3 font-semibold text-white shadow-lg transition hover:bg-sky-700"
           >
-            <i class="fa-solid fa-hand"></i> Wave at me
-          </button>
-          <span
-            x-show="showHint"
-            x-transition
-            class="absolute -top-11 left-1/2 -translate-x-1/2 rounded-full bg-slate-800 px-3 py-1 text-xs text-white shadow"
-          >
-            Say hi back!
-          </span>
+            Learn About Me
+          </a>
         </div>
+      </section>
 
-        <template x-for="wave in floatingWaves" :key="wave.id">
-          <span
-            class="wave-float pointer-events-none absolute text-2xl"
-            :style="`left: ${wave.x}%; top: ${wave.y}%;`"
-          >
-            👋
-          </span>
-        </template>
+      <section id="about" class="scroll-mt-8 rounded-3xl border border-sky-100 bg-white/95 p-10 shadow-2xl">
+        <h2 class="text-2xl font-semibold pb-1 border-b-4 border-rose-400 text-sky-700">
+          About Me
+        </h2>
+        <p class="mt-4 text-gray-700">
+          Hi! My name is Hillia and I'm a 11th grader at Waukee Northwest Highschool. I do First Tech Challenge (FTC), which got me more interested in STEM.
+        </p>
 
-        <span x-show="waves > 0" class="ml-3 text-gray-600">
-          Thanks for the <span x-text="waves"></span> wave(s)! 👋
-        </span>
-      </div>
+        <h2 class="mt-8 text-2xl font-semibold pb-1 border-b-4 border-rose-400 text-sky-700">
+          Things I'm Into...
+        </h2>
+        <ul class="mt-4 space-y-2 text-gray-700 list-disc list-inside">
+          <li>Pickleball</li>
+          <li>Dance</li>
+          <li>Robotics</li>
+        </ul>
 
-      <!-- ▲▲▲ STOP EDITING HERE (or keep going — it's your page!) ▲▲▲ -->
+        <h2 class="mt-8 text-2xl font-semibold pb-1 border-b-4 border-rose-400 text-sky-700">
+          What I'm Learning
+        </h2>
+        <p class="mt-4 text-gray-700">
+          Right now I'm learning how developers build and share software with GitHub. This page is proof — I wrote it and published it myself!
+        </p>
 
-      <footer class="mt-10 text-center text-sm text-gray-400">
-        Built with <i class="fa-solid fa-heart text-rose-400"></i> during the
-        Tech Journey course.
-      </footer>
+        <footer class="mt-10 text-center text-sm text-gray-400">
+          Built with <i class="fa-solid fa-heart text-rose-400"></i> during the
+          Tech Journey course.
+        </footer>
+      </section>
     </main>
   </body>
 </html>
