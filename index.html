@@ -60,65 +60,22 @@
     </script>
 
     <script>
-      const mysteryWords = ["coral", "ocean", "bloom", "beach", "smile", "sunset", "daisy", "glide", "spark", "dream"];
+      const mysteryWords = [
+        "about", "apple", "bloom", "beach", "brave", "candy", "charm", "chill", "cloud", "color",
+        "dance", "dream", "daisy", "glide", "grace", "happy", "heart", "hello", "joyful", "light",
+        "smile", "music", "ocean", "peace", "pride", "shine", "spark", "sunset", "sweet", "water"
+      ];
 
       function getWordOfDay() {
-        const today = new Date().toISOString().slice(0, 10);
-        const seed = today.split("").reduce((sum, char) => sum + char.charCodeAt(0), 0);
-        return mysteryWords[seed % mysteryWords.length];
+        return "smile";
       }
 
       function getHintsForWord(word) {
         const hintMap = {
-          coral: [
-            "It is connected to the ocean.",
-            "It is a color and a sea creature.",
-            "It starts with C and ends with L."
-          ],
-          ocean: [
-            "It is huge and full of water.",
-            "It is home to many fish and sea animals.",
-            "It starts with O and ends with N."
-          ],
-          bloom: [
-            "It grows in a garden.",
-            "It often has petals and color.",
-            "It starts with B and ends with M."
-          ],
-          beach: [
-            "You might find sand here.",
-            "It is a place near the water.",
-            "It starts with B and ends with H."
-          ],
           smile: [
-            "It is something people do when happy.",
-            "It is a friendly expression.",
+            "It is something people do when they are happy.",
+            "It is a friendly expression that shows joy.",
             "It starts with S and ends with E."
-          ],
-          sunset: [
-            "It happens when the sky turns warm colors.",
-            "It is a beautiful evening view.",
-            "It starts with S and ends with T."
-          ],
-          daisy: [
-            "It is a pretty flower.",
-            "It often has white petals.",
-            "It starts with D and ends with Y."
-          ],
-          glide: [
-            "It means to move smoothly.",
-            "It can describe a calm movement.",
-            "It starts with G and ends with E."
-          ],
-          spark: [
-            "It can be a tiny burst of light.",
-            "It can also mean a bright idea.",
-            "It starts with S and ends with K."
-          ],
-          dream: [
-            "It can happen while you sleep.",
-            "It can also mean a hopeful goal.",
-            "It starts with D and ends with M."
           ]
         };
 
@@ -163,10 +120,15 @@
               message: 'Guess today\'s 5-letter mystery word.',
               hints: [],
               hintIndex: 0,
+              unlocked: false,
               init() {
                 this.hints = getHintsForWord(this.target);
               },
+              unlockGame() {
+                this.unlocked = true;
+              },
               submitGuess() {
+                if (!this.unlocked) return;
                 const guess = this.currentGuess.trim().toLowerCase();
                 if (guess.length !== 5) {
                   this.message = 'Please enter a 5-letter word.';
@@ -212,6 +174,7 @@
                 }
               },
               getHint() {
+                if (!this.unlocked) return;
                 if (this.hintIndex < this.hints.length) {
                   this.message = this.hints[this.hintIndex];
                   this.hintIndex += 1;
@@ -227,50 +190,66 @@
             }"
             class="mx-auto mt-8 w-full max-w-xl rounded-3xl border border-sky-100 bg-white/70 p-6 text-left shadow-inner backdrop-blur-xl"
           >
-            <h3 class="text-xl font-semibold text-sky-700">Find Out Today's Mystery Word</h3>
-            <p class="mt-2 text-sm text-slate-600">
-              You have 5 tries to guess a 5-letter word.
-            </p>
+            <div x-show="!unlocked" class="space-y-4 text-center">
+              <h3 class="text-xl font-semibold text-sky-700">Find Out Today's Mystery Word</h3>
+              <p class="text-sm text-slate-600">
+                The game is hidden until you press play.
+              </p>
+              <button
+                type="button"
+                @click="unlockGame"
+                class="rounded-full bg-rose-500 px-5 py-2 font-semibold text-white transition hover:bg-rose-600"
+              >
+                Play Game
+              </button>
+            </div>
 
-            <form @submit.prevent="submitGuess" class="mt-4">
-              <input
-                x-model="currentGuess"
-                maxlength="5"
-                class="w-full rounded-xl border border-slate-300 px-4 py-3 text-lg uppercase tracking-[0.3em] outline-none focus:border-sky-500"
-                placeholder="Type a word"
-              />
-              <div class="mt-3 flex flex-wrap gap-2">
-                <button
-                  type="submit"
-                  class="rounded-full bg-rose-500 px-4 py-2 font-semibold text-white transition hover:bg-rose-600"
-                >
-                  Guess
-                </button>
-                <button
-                  type="button"
-                  @click="getHint"
-                  class="rounded-full bg-sky-600 px-4 py-2 font-semibold text-white transition hover:bg-sky-700"
-                >
-                  Give Hint
-                </button>
-              </div>
-            </form>
+            <div x-show="unlocked" class="space-y-4">
+              <h3 class="text-xl font-semibold text-sky-700">Find Out Today's Mystery Word</h3>
+              <p class="mt-2 text-sm text-slate-600">
+                You have 5 tries to guess a 5-letter word.
+              </p>
 
-            <p class="mt-3 text-sm text-slate-600" x-text="message"></p>
-
-            <div class="mt-4 space-y-2">
-              <template x-for="(row, rowIndex) in rows" :key="rowIndex">
-                <div class="grid grid-cols-5 gap-2">
-                  <template x-for="(letter, index) in row.guess.split('')" :key="index">
-                    <div
-                      :class="getTileClass(row.result[index])"
-                      class="flex h-12 items-center justify-center rounded-lg text-lg font-bold uppercase"
-                    >
-                      <span x-text="letter"></span>
-                    </div>
-                  </template>
+              <form @submit.prevent="submitGuess" class="mt-4">
+                <input
+                  x-model="currentGuess"
+                  maxlength="5"
+                  class="w-full rounded-xl border border-slate-300 px-4 py-3 text-lg uppercase tracking-[0.3em] outline-none focus:border-sky-500"
+                  placeholder="Type a word"
+                />
+                <div class="mt-3 flex flex-wrap gap-2">
+                  <button
+                    type="submit"
+                    class="rounded-full bg-rose-500 px-4 py-2 font-semibold text-white transition hover:bg-rose-600"
+                  >
+                    Guess
+                  </button>
+                  <button
+                    type="button"
+                    @click="getHint"
+                    class="rounded-full bg-sky-600 px-4 py-2 font-semibold text-white transition hover:bg-sky-700"
+                  >
+                    Give Hint
+                  </button>
                 </div>
-              </template>
+              </form>
+
+              <p class="mt-3 text-sm text-slate-600" x-text="message"></p>
+
+              <div class="mt-4 space-y-2">
+                <template x-for="(row, rowIndex) in rows" :key="rowIndex">
+                  <div class="grid grid-cols-5 gap-2">
+                    <template x-for="(letter, index) in row.guess.split('')" :key="index">
+                      <div
+                        :class="getTileClass(row.result[index])"
+                        class="flex h-12 items-center justify-center rounded-lg text-lg font-bold uppercase"
+                      >
+                        <span x-text="letter"></span>
+                      </div>
+                    </template>
+                  </div>
+                </template>
+              </div>
             </div>
           </div>
         </div>
