@@ -59,6 +59,73 @@
       };
     </script>
 
+    <script>
+      const mysteryWords = ["coral", "ocean", "bloom", "beach", "smile", "sunset", "daisy", "glide", "spark", "dream"];
+
+      function getWordOfDay() {
+        const today = new Date().toISOString().slice(0, 10);
+        const seed = today.split("").reduce((sum, char) => sum + char.charCodeAt(0), 0);
+        return mysteryWords[seed % mysteryWords.length];
+      }
+
+      function getHintsForWord(word) {
+        const hintMap = {
+          coral: [
+            "It is connected to the ocean.",
+            "It is a color and a sea creature.",
+            "It starts with C and ends with L."
+          ],
+          ocean: [
+            "It is huge and full of water.",
+            "It is home to many fish and sea animals.",
+            "It starts with O and ends with N."
+          ],
+          bloom: [
+            "It grows in a garden.",
+            "It often has petals and color.",
+            "It starts with B and ends with M."
+          ],
+          beach: [
+            "You might find sand here.",
+            "It is a place near the water.",
+            "It starts with B and ends with H."
+          ],
+          smile: [
+            "It is something people do when happy.",
+            "It is a friendly expression.",
+            "It starts with S and ends with E."
+          ],
+          sunset: [
+            "It happens when the sky turns warm colors.",
+            "It is a beautiful evening view.",
+            "It starts with S and ends with T."
+          ],
+          daisy: [
+            "It is a pretty flower.",
+            "It often has white petals.",
+            "It starts with D and ends with Y."
+          ],
+          glide: [
+            "It means to move smoothly.",
+            "It can describe a calm movement.",
+            "It starts with G and ends with E."
+          ],
+          spark: [
+            "It can be a tiny burst of light.",
+            "It can also mean a bright idea.",
+            "It starts with S and ends with K."
+          ],
+          dream: [
+            "It can happen while you sleep.",
+            "It can also mean a hopeful goal.",
+            "It starts with D and ends with M."
+          ]
+        };
+
+        return hintMap[word] || ["It is a fun five-letter word."];
+      }
+    </script>
+
     <style>
       html {
         scroll-behavior: smooth;
@@ -85,6 +152,127 @@
           >
             Learn About Me
           </a>
+
+          <div
+            x-data="{
+              target: getWordOfDay(),
+              currentGuess: '',
+              rows: [],
+              attempts: 0,
+              maxTries: 5,
+              message: 'Guess today\'s 5-letter mystery word.',
+              hints: [],
+              hintIndex: 0,
+              init() {
+                this.hints = getHintsForWord(this.target);
+              },
+              submitGuess() {
+                const guess = this.currentGuess.trim().toLowerCase();
+                if (guess.length !== 5) {
+                  this.message = 'Please enter a 5-letter word.';
+                  return;
+                }
+                if (!mysteryWords.includes(guess)) {
+                  this.message = 'That word is not in the game list.';
+                  return;
+                }
+
+                const result = [];
+                const targetLetters = this.target.split('');
+                const used = Array(5).fill(false);
+
+                for (let i = 0; i < 5; i++) {
+                  if (guess[i] === targetLetters[i]) {
+                    result.push('green');
+                    used[i] = true;
+                  } else {
+                    result.push('gray');
+                  }
+                }
+
+                for (let i = 0; i < 5; i++) {
+                  if (result[i] === 'green') continue;
+                  const targetIndex = targetLetters.findIndex((letter, index) => letter === guess[i] && !used[index]);
+                  if (targetIndex !== -1) {
+                    result[i] = 'yellow';
+                    used[targetIndex] = true;
+                  }
+                }
+
+                this.rows.push({ guess, result });
+                this.attempts += 1;
+                this.currentGuess = '';
+
+                if (guess === this.target) {
+                  this.message = 'You cracked it!';
+                } else if (this.attempts >= this.maxTries) {
+                  this.message = 'No more tries! The word was ' + this.target.toUpperCase() + '.';
+                } else {
+                  this.message = 'Keep going!';
+                }
+              },
+              getHint() {
+                if (this.hintIndex < this.hints.length) {
+                  this.message = this.hints[this.hintIndex];
+                  this.hintIndex += 1;
+                } else {
+                  this.message = 'No more hints left for today.';
+                }
+              },
+              getTileClass(state) {
+                if (state === 'green') return 'bg-emerald-500 text-white';
+                if (state === 'yellow') return 'bg-amber-400 text-white';
+                return 'bg-slate-200 text-slate-700';
+              }
+            }"
+            class="mx-auto mt-8 w-full max-w-xl rounded-3xl border border-sky-100 bg-white/70 p-6 text-left shadow-inner backdrop-blur-xl"
+          >
+            <h3 class="text-xl font-semibold text-sky-700">Find Out Today's Mystery Word</h3>
+            <p class="mt-2 text-sm text-slate-600">
+              You have 5 tries to guess a 5-letter word.
+            </p>
+
+            <form @submit.prevent="submitGuess" class="mt-4">
+              <input
+                x-model="currentGuess"
+                maxlength="5"
+                class="w-full rounded-xl border border-slate-300 px-4 py-3 text-lg uppercase tracking-[0.3em] outline-none focus:border-sky-500"
+                placeholder="Type a word"
+              />
+              <div class="mt-3 flex flex-wrap gap-2">
+                <button
+                  type="submit"
+                  class="rounded-full bg-rose-500 px-4 py-2 font-semibold text-white transition hover:bg-rose-600"
+                >
+                  Guess
+                </button>
+                <button
+                  type="button"
+                  @click="getHint"
+                  class="rounded-full bg-sky-600 px-4 py-2 font-semibold text-white transition hover:bg-sky-700"
+                >
+                  Give Hint
+                </button>
+              </div>
+            </form>
+
+            <p class="mt-3 text-sm text-slate-600" x-text="message"></p>
+
+            <div class="mt-4 space-y-2">
+              <template x-for="(row, rowIndex) in rows" :key="rowIndex">
+                <div class="grid grid-cols-5 gap-2">
+                  <template x-for="(letter, index) in row.guess.split('')" :key="index">
+                    <div
+                      :class="getTileClass(row.result[index])"
+                      class="flex h-12 items-center justify-center rounded-lg text-lg font-bold uppercase"
+                    >
+                      <span x-text="letter"></span>
+                    </div>
+                  </template>
+                </div>
+              </template>
+            </div>
+          </div>
         </div>
       </section>
 
