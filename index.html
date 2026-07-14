@@ -58,6 +58,27 @@
         },
       };
     </script>
+
+    <style>
+      .wave-float {
+        animation: wave-float 1.8s ease-out forwards;
+      }
+
+      @keyframes wave-float {
+        0% {
+          opacity: 0;
+          transform: translate(-50%, 0) scale(0.7);
+        }
+        20% {
+          opacity: 1;
+          transform: translate(-50%, -18px) scale(1);
+        }
+        100% {
+          opacity: 0;
+          transform: translate(-50%, -120px) scale(1.2);
+        }
+      }
+    </style>
   </head>
 
   <!-- The classes below set the gradient background and center the card. -->
@@ -103,13 +124,34 @@
         x-data gives this box a tiny bit of "memory" (waves),
         @click runs code when clicked, and x-text shows a value.
       -->
-      <div x-data="{ waves: 0 }" class="mt-8">
-        <button
-          @click="waves++"
-          class="bg-sky-600 hover:bg-sky-700 text-white font-semibold px-5 py-2 rounded-lg shadow transition"
-        >
-          <i class="fa-solid fa-hand"></i> Wave at me
-        </button>
+      <div x-data="{ waves: 0, showHint: false, floatingWaves: [] }" class="mt-8 relative">
+        <div class="inline-block relative">
+          <button
+            @mouseenter="showHint = true"
+            @mouseleave="showHint = false"
+            @click="waves++; const burst = Array.from({ length: 14 }, (_, i) => ({ id: Date.now() + i, x: 10 + Math.random() * 80, y: 20 + Math.random() * 40 })); floatingWaves = [...floatingWaves, ...burst]; setTimeout(() => { floatingWaves = floatingWaves.filter((item) => !burst.some((b) => b.id === item.id)); }, 1800)"
+            class="bg-sky-600 hover:bg-sky-700 text-white font-semibold px-5 py-2 rounded-lg shadow transition"
+          >
+            <i class="fa-solid fa-hand"></i> Wave at me
+          </button>
+          <span
+            x-show="showHint"
+            x-transition
+            class="absolute -top-11 left-1/2 -translate-x-1/2 rounded-full bg-slate-800 px-3 py-1 text-xs text-white shadow"
+          >
+            Say hi back!
+          </span>
+        </div>
+
+        <template x-for="wave in floatingWaves" :key="wave.id">
+          <span
+            class="wave-float pointer-events-none absolute text-2xl"
+            :style="`left: ${wave.x}%; top: ${wave.y}%;`"
+          >
+            👋
+          </span>
+        </template>
+
         <span x-show="waves > 0" class="ml-3 text-gray-600">
           Thanks for the <span x-text="waves"></span> wave(s)! 👋
         </span>
